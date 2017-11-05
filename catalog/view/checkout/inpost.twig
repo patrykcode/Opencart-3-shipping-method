@@ -1,0 +1,43 @@
+<div class="map-box">
+<h3>Wybierz swoje miasto</h3>
+<div class="input-group">  
+<select name="paczkomaty" class="form-control"> 
+    {%for key,wojew in machine%}
+        <option value="" disabled>{{key}}</option>
+        {%for m,miasto in wojew %}
+            <option value="{{key}}|{{m}}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{m}}</option>
+        {%endfor%}
+    {%endfor%}
+</select>
+<span class="input-group-addon" id="close-map">
+    <i class="fa fa-times" aria-hidden="true"></i>
+</span>
+</div>
+
+<div class="mapa"></div>
+
+<script>
+    $(document).ready(function () {
+        $('select[name="paczkomaty"]').change(function () {
+            $.ajax({
+                url: 'index.php?route=checkout/inpost',
+                type: 'post',
+                data: 'box=' + $(this).val(),
+                dataType: 'json',
+                beforeSend:function(){
+                    $('.loader').html('<div class="lds-css ng-scope"><div style="width:100%;height:100%" class="lds-eclipse"><div></div></div></div>');
+                },
+                success: function (json) {
+                    
+                    $('.mapa').html(json);
+                    $('.loader').html('');
+                }
+            });
+        });
+        $('#close-map').click(function(){
+             $('.inpost-box').html('');
+        });
+
+    });
+</script>
+</div>

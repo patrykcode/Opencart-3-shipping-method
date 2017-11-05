@@ -1,0 +1,58 @@
+
+<div id="map" style="width:500px;height:300px;"></div>
+
+<script>
+
+
+    function initMap() {
+    document.querySelector('.loader').innerHTML = '<div class="lds-css ng-scope"><div style="width:100%;height:100%" class="lds-eclipse"><div></div></div></div>';
+    var map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 12,
+            center: {lat:{{newbox[0][4]}}, lng: {{newbox[0][5]}}},
+    });
+    var infowindow = new google.maps.InfoWindow();
+    var marker, i;
+    {% for new in newbox %}
+
+        marker = new google.maps.Marker({
+        position: new google.maps.LatLng({{new[4]}}, {{new[5]}}),
+                map: map
+        });
+        google.maps.event.addListener(marker, 'click', (function (marker, i) {
+        return function () {
+
+            var html = '<p>ul {{new[2]}} {{new[3]}}</p><a onclick="adres(this)" data-street="{{new[2]}} {{new[3]}}" data-city="{{new[0]}}" data-postcode="{{new[1]}}">wybierz</a>'
+
+
+                infowindow.setContent(html);
+        infowindow.open(map, marker);
+        }
+        })(marker, i));
+    {%endfor%}
+        document.querySelector('.loader').innerHTML = '';
+        }
+        function adres(item){
+
+        var data_post = {
+        ulica :item.getAttribute('data-street'),
+                miasto :item.getAttribute('data-city'),
+                kod :item.getAttribute('data-postcode'),
+        }
+        $.ajax({
+        url: 'index.php?route=checkout/inpost/newaddress',
+                type: 'post',
+                data: data_post,
+                dataType: 'json',
+                beforeSend:function(){
+                $('.loader').html('<div class="lds-css ng-scope"><div style="width:100%;height:100%" class="lds-eclipse"><div></div></div></div>');
+                },
+                success: function () {
+                $('.loader').html('');
+                var comment = data_post.miasto + '\n' + data_post.ulica + '\n' + data_post.kod;
+                $('[name="comment"]').html(comment);
+                $('.inpost-box').html('');
+                }
+        });
+        }
+</script> 
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAd3w6HGoU-OvIMyOhV2I6JV1jiC9ZQroY&callback=initMap" type="text/javascript"></script>
